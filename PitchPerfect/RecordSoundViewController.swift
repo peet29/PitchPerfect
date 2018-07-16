@@ -9,7 +9,7 @@
 import UIKit
 import AVFoundation
 
-class RecordSoundViewController: UIViewController {
+class RecordSoundViewController: UIViewController, AVAudioRecorderDelegate {
 
     @IBOutlet weak var recordingLable: UILabel!
     @IBOutlet weak var recordButton: UIButton!
@@ -30,11 +30,6 @@ class RecordSoundViewController: UIViewController {
     @IBAction func recordAudio(_ sender: Any) {
         recordingLable.text = "Recording in Progress"
         toggleButton()
-    }
-    @IBAction func stopRecording(_ sender: Any) {
-        recordingLable.text = "Tab to Record"
-        toggleButton()
-        
         let dirPath = NSSearchPathForDirectoriesInDomains(.documentDirectory,.userDomainMask, true).first
         let recordingName = "/recordedVoice.wav"
         let filePathString = dirPath! + recordingName
@@ -42,18 +37,34 @@ class RecordSoundViewController: UIViewController {
         
         let session = AVAudioSession.sharedInstance()
         try! session.setCategory(AVAudioSession.Category.playAndRecord, mode: AVAudioSession.Mode.default, options: AVAudioSession.CategoryOptions.defaultToSpeaker)
-
+        
         try! audioRecorder = AVAudioRecorder(url: filePath!, settings: [:])
+        audioRecorder.delegate = self
         audioRecorder.isMeteringEnabled = true
         audioRecorder.prepareToRecord()
         audioRecorder.record()
     }
-    
-    
+    @IBAction func stopRecording(_ sender: Any) {
+        recordingLable.text = "Tab to Record"
+        toggleButton()
+        
+        audioRecorder.stop()
+        let audioSession = AVAudioSession.sharedInstance()
+        try! audioSession.setActive(false)
+    }
     
     private func toggleButton() {
         stopRecordButton.isEnabled = recordButton.isEnabled
         recordButton.isEnabled = !stopRecordButton.isEnabled
     }
+    
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
+        if flag {
+        performSegue(withIdentifier: "stopRecordinfg", sender: audioRecorder.url)
+        }else {
+            print("recording Fail")
+        }
+    }
+    
 }
 
