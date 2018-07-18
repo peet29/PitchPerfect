@@ -19,7 +19,6 @@ class RecordSoundViewController: UIViewController, AVAudioRecorderDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -60,9 +59,17 @@ class RecordSoundViewController: UIViewController, AVAudioRecorderDelegate {
     
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         if flag {
-        performSegue(withIdentifier: "stopRecordinfg", sender: audioRecorder.url)
+        performSegue(withIdentifier: "stopRecording", sender: audioRecorder.url)
         }else {
             print("recording Fail")
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "stopRecording" {
+            let playSoundVC = segue.destination as! PlaySoundViewController
+            let recordedAudioURL = sender as! URL
+            playSoundVC.recordedAudioURL = recordedAudioURL
         }
     }
     
