@@ -51,6 +51,8 @@ class RecordSoundViewController: UIViewController, AVAudioRecorderDelegate {
         try! audioSession.setActive(false)
     }
     
+    
+    //use enum to set text and button status
     private func buttonConfig( _ buttonState:ButtonState) {
         switch buttonState {
         case .recording:
@@ -62,6 +64,7 @@ class RecordSoundViewController: UIViewController, AVAudioRecorderDelegate {
         }
     }
     
+    // toggle button status
     private func toggleButton(){
         stopRecordButton.isEnabled = recordButton.isEnabled
         recordButton.isEnabled = !stopRecordButton.isEnabled
