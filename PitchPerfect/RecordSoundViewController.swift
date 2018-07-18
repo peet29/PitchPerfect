@@ -10,25 +10,26 @@ import UIKit
 import AVFoundation
 
 class RecordSoundViewController: UIViewController, AVAudioRecorderDelegate {
-
+    
     @IBOutlet weak var recordingLable: UILabel!
     @IBOutlet weak var recordButton: UIButton!
     @IBOutlet weak var stopRecordButton: UIButton!
     
     private var audioRecorder: AVAudioRecorder!
     
+    enum ButtonState { case recording, notRecording }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         stopRecordButton.isEnabled = false
     }
-
+    
     @IBAction func recordAudio(_ sender: Any) {
-        recordingLable.text = "Recording in Progress"
-        toggleButton()
+        buttonConfig(.recording)
         let dirPath = NSSearchPathForDirectoriesInDomains(.documentDirectory,.userDomainMask, true).first
         let recordingName = "/recordedVoice.wav"
         let filePathString = dirPath! + recordingName
@@ -44,22 +45,31 @@ class RecordSoundViewController: UIViewController, AVAudioRecorderDelegate {
         audioRecorder.record()
     }
     @IBAction func stopRecording(_ sender: Any) {
-        recordingLable.text = "Tab to Record"
-        toggleButton()
-        
+        buttonConfig(.notRecording)
         audioRecorder.stop()
         let audioSession = AVAudioSession.sharedInstance()
         try! audioSession.setActive(false)
     }
     
-    private func toggleButton() {
+    private func buttonConfig( _ buttonState:ButtonState) {
+        switch buttonState {
+        case .recording:
+            recordingLable.text = "Recording in Progress"
+            toggleButton()
+        case .notRecording:
+            recordingLable.text = "Tab to Record"
+            toggleButton()
+        }
+    }
+    
+    private func toggleButton(){
         stopRecordButton.isEnabled = recordButton.isEnabled
         recordButton.isEnabled = !stopRecordButton.isEnabled
     }
     
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         if flag {
-        performSegue(withIdentifier: "stopRecording", sender: audioRecorder.url)
+            performSegue(withIdentifier: "stopRecording", sender: audioRecorder.url)
         }else {
             print("recording Fail")
         }
